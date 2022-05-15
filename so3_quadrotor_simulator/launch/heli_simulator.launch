@@ -1,0 +1,27 @@
+<launch>  
+   <arg name="man_mode" default="0" />
+
+   <node pkg="so3_quadrotor_simulator" type="helicopter_simulator_so3" name="helicopter_simulator_so3" output="screen">
+     <param name="rate/odom" value="100.0"/>
+     <param name="rate/simulation" value="400.0"/>
+     <param name="manual_ctrl_mode" value="$(arg man_mode)"/>
+
+     <param name="simulator/init_state_x" value="0.0"/>
+     <param name="simulator/init_state_y" value="0.0"/>
+     <param name="simulator/init_state_z" value="2"/>
+     <remap from="~odom" to="/visual_slam/odom"/>
+     <remap from="~cmd" to="so3_cmd"/>
+     <remap from="~imu" to="sim/imu"/>
+     <remap from="~force_disturbance" to="force_disturbance"/>    
+     <remap from="~moment_disturbance" to="moment_disturbance"/>        
+   </node>
+ 
+   <node pkg="so3_disturbance_generator" name="so3_disturbance_generator" type="so3_disturbance_generator" output="screen">
+     <remap from="~odom" to="/visual_slam/odom"/>              <!-- Ground Truth & Fake VSLAM Odom -->
+     <remap from="~noisy_odom" to="/state_ukf/odom"/>          <!-- Fake VINS Odom                 -->
+     <remap from="~correction" to="/visual_slam/correction"/>  <!-- Fake VSLAM Correction          -->   
+     <remap from="~force_disturbance" to="force_disturbance"/>        
+     <remap from="~moment_disturbance" to="moment_disturbance"/>            
+   </node>
+ </launch>
+
